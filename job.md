@@ -43,3 +43,95 @@ Deploy to Production: Deploy to production servers after passing tests and quali
 Automate Releases: Create GitHub releases, update version numbers, or publish artifacts when a new tag is pushed.
 * Custom Workflows: Scheduled Jobs: Run tasks on a schedule, like running database backups or generating reports.
 Multi-Stage Workflows: Run different jobs for different parts of your CI/CD pipeline, like testing, building, and deploying, in a controlled sequence.
+
+
+### In GitHub Actions, you can control whether jobs run sequentially or in parallel by configuring dependencies between jobs.
+### 1. Running Jobs in Parallel
+* By default, jobs in a GitHub Actions workflow run in parallel unless specified otherwise. For example, if you have multiple jobs without any dependencies, they will all run at the same time:
+```yaml
+name: CI
+
+on: [push]
+
+jobs:
+  job1:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      - name: Run job1 steps
+        run: echo "Job 1 running"
+
+  job2:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      - name: Run job2 steps
+        run: echo "Job 2 running"
+
+```
+
+### 2. Running Jobs Sequentially
+* To make jobs run sequentially, you need to define dependencies between them using the needs keyword. This makes sure that one job only starts after the jobs it depends on have completed successfully.
+
+* Example where job2 runs only after job1 has completed:
+```yaml
+name: CI
+
+on: [push]
+
+jobs:
+  job1:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      - name: Run job1 steps
+        run: echo "Job 1 running"
+
+  job2:
+    runs-on: ubuntu-latest
+    needs: job1
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      - name: Run job2 steps
+        run: echo "Job 2 running after Job 1"
+
+```
+### 3. Chaining Jobs
+* You can chain multiple jobs to create a sequence of tasks. For instance, if you have three jobs where job3 should run only after job2 and job2 should run only after job1, you can set it up like this:
+
+```yaml
+name: CI
+
+on: [push]
+
+jobs:
+  job1:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      - name: Run job1 steps
+        run: echo "Job 1 running"
+
+  job2:
+    runs-on: ubuntu-latest
+    needs: job1
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      - name: Run job2 steps
+        run: echo "Job 2 running after Job 1"
+
+  job3:
+    runs-on: ubuntu-latest
+    needs: job2
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      - name: Run job3 steps
+        run: echo "Job 3 running after Job 2"
+```
