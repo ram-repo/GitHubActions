@@ -1,0 +1,42 @@
+name: Publish Helm Chart
+
+on:
+  push:
+    branches:
+      - main # Run only on pushes to the main branch (modify as needed)
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+
+    steps:
+    # 1. Checkout the repository
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    # 2. Install Helm
+    - name: Install Helm
+      run: |
+        curl -fsSL https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
+
+    # 3. Install Helm Push Plugin
+    - name: Install Helm Push Plugin
+      run: |
+        helm plugin install https://github.com/chartmuseum/helm-push
+
+    # 4. Authenticate with Artifactory
+    - name: Authenticate with JFrog
+      env:
+        JFROG_API_KEY: ${{ secrets.JFROG_API_KEY }} # Store this in GitHub Secrets
+      run: |
+        echo $JFROG_API_KEY | helm repo add helm-repo https://ramjfrog.io/artifactory/helm-repo --username ${{ secrets.JFROG_USERNAME }} --password -
+
+    # 5. Package Helm Chart
+    - name: Package Helm Chart
+      run: |
+        helm package ./charts/mychart
+
+    # 6. Push the Chart to the Repository
+    - name: Push Helm Chart
+      run: |
+        helm push ./mychart-0.1.0.tgz helm-repo
