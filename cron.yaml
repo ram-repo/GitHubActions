@@ -1,0 +1,19 @@
+name: Scheduled and Manual Trigger
+
+on:
+  schedule:
+    - cron: '0 0 * * *'  # Runs daily at midnight UTC
+  workflow_dispatch:  # Allows manual trigger on any branch
+
+jobs:
+  run-script:
+    runs-on: ubuntu-latest
+    if: |
+      (github.event_name == 'schedule' && github.ref == 'refs/heads/main-1') ||
+      (github.event_name == 'workflow_dispatch')
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Run script
+        run: echo "This job runs on schedule (only on main-1) or manually (on any branch)!"
