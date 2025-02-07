@@ -1,83 +1,100 @@
-# Helm Chart CI/CD Workflow
+# 🔄 Helm Chart Build Promotion Workflow
 
-This document outlines the automated CI/CD process for building, testing, and publishing Helm charts, ensuring a seamless deployment pipeline.
+This document outlines the automated process for **Helm chart build promotion**, ensuring controlled and seamless deployment across environments.
 
 ---
 
-## 1. Developer Updates  
-Developers update the application Helm repository and push changes to the Git repository.
+## 1️⃣ Developer Updates & Push to Git  
+Developers update the **application Helm chart** and push changes to the repository.
 
 ### 🔹 Process:
-- Modify `Chart.yaml` to update:
-  - **Versioning** (major, minor, or patch)
-  - **Dependencies**  
+- Modify `Chart.yaml`:
+  - **Version bump** (major, minor, patch)
+  - **Dependencies update**
   - **Metadata changes** (description, maintainers, etc.)
-- Commit and push changes to the Git repository.
+- Commit and push changes to the **Git repository**.
 
 ---
 
-## 2. Pipeline Triggered  
-A CI/CD pipeline starts automatically when changes are pushed.
+## 2️⃣ Pipeline Trigger  
+A CI/CD pipeline is automatically triggered upon detecting changes.
 
 ### 🔹 Process:
 - **Trigger Events:**  
-  - Push to main or feature branches  
+  - Code push (main/feature branches)  
   - Pull requests  
-- **Automation:** Ensures a continuous integration and delivery workflow.
+- **Automation:** Ensures continuous integration and builds.
 
 ---
 
-## 3. Build & Publish Helm Chart  
-The pipeline validates, builds, and publishes the Helm chart if the version is new.
+## 3️⃣ Build & Publish Helm Chart  
+The pipeline **validates, builds, and publishes** the Helm chart.
 
 ### 🔹 Process:
-1. **Build:** The Helm chart is packaged into a deployable artifact.
-2. **Lint Checks:** Ensures compliance with Helm best practices.
-3. **Version Validation:**
-   - If the **version exists**, the build **fails** (prevents overwriting).
-   - If the **version is new**, the chart is published to **Artifactory**.
+1. **Build Helm Chart:** Packages the chart into a deployable artifact.
+2. **Lint & Validate:** Ensures best practices and YAML syntax correctness.
+3. **Version Check:**  
+   - ✅ If the version **is new**, publish the chart to **Artifactory**.  
+   - ❌ If the version **exists**, the build **fails** (prevents overwriting).  
+4. **Tagging:** A new `build-buildnumber` tag is created.
 
 ---
 
-## 4. Vulcan Tag Update  
-The pipeline updates the **Vulcan tag** to reflect the new Helm chart version.
+## 4️⃣ Vulcan Tag Update  
+The pipeline updates the **Vulcan tag** to reflect the latest Helm chart version.
 
 ### 🔹 Purpose:
-- Maintains correct versioning across pipeline stages.
-- Ensures traceability in version control.
+- Maintains version control for promotion across environments.
+- Ensures consistency in the pipeline.
 
 ---
 
-## 5. Daily Automation (Vulcan Stage)  
-A scheduled **cron job** automates updates to the **umbrella Helm chart**.
+## 5️⃣ Build Promotion Across Environments  
+After publishing the Helm chart, a **promotion process** ensures controlled deployment.
 
 ### 🔹 Process:
-1. **Cron Job Execution:** Runs daily at a scheduled time.
-2. **Umbrella Chart Update:** Syncs with the latest application versions.
-3. **Version Tagging:**  
-   - Creates a new **version tag**.  
-   - Pushes it to the Git repository for tracking.
+1. **Promote from Dev → Stable → PT:**  
+   - The chart version is validated before promotion.
+   - **Automation** ensures only validated builds proceed.
+2. **Version Tagging:**  
+   - **New promotion tags** (`dev`, `stable`, `pt`) are created.
+   - Tags are pushed to **Git and Artifactory**.
+3. **Umbrella Helm Chart Update:**  
+   - The umbrella chart is updated with the latest promoted versions.
+   - A **new version tag** is created for tracking.
 
 ---
 
-## 6. Umbrella Helm Chart Workflow  
-Triggers on updates to the **umbrella Helm chart**, creating a **DataFabric version tag**.
+## 6️⃣ Daily Automation (Vulcan Stage)  
+A **cron job** updates and promotes Helm charts automatically.
 
 ### 🔹 Process:
-- **Workflow Trigger:** Detects changes in the umbrella Helm chart.
-- **Tag Creation:** Generates a new **DataFabric version tag**.
-- **Publishing:** Pushes the new version to **Artifactory** for deployment.
+1. **Scheduled Execution:** Runs daily.
+2. **Version Updates:** Updates the umbrella Helm chart.
+3. **Tagging & Publishing:**  
+   - Creates a new **Vulcan tag**.  
+   - Publishes to **Git & Artifactory**.
 
 ---
 
-## 🎯 Key Benefits
-✅ Fully automated Helm chart versioning and publishing  
-✅ Pre-validation with linting to ensure best practices  
-✅ Versioning enforcement to prevent accidental overwrites  
-✅ Continuous integration with automated triggers  
-✅ Traceability with version tagging and Artifactory publishing  
+## 7️⃣ Final Umbrella Helm Chart Workflow  
+Triggers upon changes in the **umbrella Helm chart**, ensuring **DataFabric versioning**.
+
+### 🔹 Process:
+- **Detects updates** in the umbrella chart.
+- **Creates a new DataFabric version tag**.
+- **Publishes to Artifactory**, making it available for deployment.
+
+---
+
+## 🎯 Key Benefits of Build Promotion  
+✅ **Ensures only validated builds move to higher environments**  
+✅ **Prevents accidental overwrites with strict version checks**  
+✅ **Automated tagging for better traceability**  
+✅ **Controlled promotion from Dev → Stable → PT**  
+✅ **Daily automation ensures up-to-date Helm charts**  
 
 ---
 
 ## 📌 Summary  
-This workflow guarantees an efficient, automated, and controlled Helm chart lifecycle from development to deployment.  
+This workflow ensures an **automated, validated, and controlled** Helm chart promotion process across multiple environments, maintaining consistency and reliability.
