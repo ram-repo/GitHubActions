@@ -1,0 +1,84 @@
+on:
+  workflow_dispatch:
+    inputs:
+      infra_action:
+        description: "Infrastructure action to perform"
+        required: true
+        type: choice
+        options:
+          - no-action           # No infrastructure changes
+          - destroy             # Destroy infrastructure only
+          - create              # Create infrastructure only
+          - destroy-and-create  # Destroy and create infra
+        default: no-action     # Default to no-action (no changes)
+
+      product_action:
+        description: "Select a product operation"
+        required: true
+        type: choice
+        options:
+          - no-action            # No product operation
+          - base                 # Install base only
+          - data-fabric          # Install data-fabric only
+          - uninstall_base       # Uninstall base
+          - uninstall_data-fabric # Uninstall data-fabric
+          - deploy_all           # Install both base and data-fabric
+          - uninstall_all        # Uninstall everything
+        default: deploy_all     # Default to deploy_all
+
+      deployment_type:
+        description: "Deployment method"
+        required: true
+        type: choice
+        options:
+          - helm
+          - argocd
+        default: argocd
+
+      data_fabric_version:
+        description: "Data Fabric version (e.g., vulcan)"
+        required: true
+        type: string
+        default: usvulcan
+
+      primary_chart_repo:
+        description: "Primary chart repo"
+        required: true
+        type: choice
+        options:
+          - data-fabric
+          - data-fabric-snapshot
+
+      tf_config:
+        description: "Terraform config as JSON (e.g. {\"agents\":2,\"vol\":250,\"iops\":1300})"
+        required: true
+        type: string
+
+      tf_network:
+        description: "Network config as JSON (e.g. {\"vpc\":\"vpc-123\",\"subnet\":\"subnet-abc\"})"
+        required: false
+        type: string
+
+      tf_instance_type:
+        description: "EC2 instance type (e.g., t3.medium)"
+        required: true
+        type: string
+        default: "t3.medium"
+
+      tf_region:
+        description: "AWS region"
+        required: true
+        type: string
+        default: "us-west-2"
+
+      deploy_clamp_plugin:
+        description: "Deploy clamp plugin?"
+        required: true
+        type: boolean
+        default: false
+
+      enable_organizer_sidecar:
+        description: "Enable organizer sidecar?"
+        required: true
+        type: boolean
+        default: false
