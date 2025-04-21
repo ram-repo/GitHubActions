@@ -1,0 +1,24 @@
+#!/usr/bin/env bash
+set -e
+
+if [ $# -ne 3 ]; then
+  echo "Usage: $0 <JFROG_URL> <API_TOKEN> <COMPONENTS_JSON>"
+  exit 1
+fi
+
+JFROG_URL=$1
+API_TOKEN=$2
+COMP_FILE=$3
+
+# Generate and download SBOMs
+curl -s -X POST "$JFROG_URL/xray/api/v2/component/exportDetails" \
+     -H "Content-Type: application/json" \
+     -H "Authorization: Bearer $API_TOKEN" \
+     -d @"$COMP_FILE" \
+     -o sbom.zip
+
+# Extract
+mkdir -p sbom_outputs
+unzip -o sbom.zip -d sbom_outputs
+
+echo "SBOMs are in ./sbom_outputs/"
