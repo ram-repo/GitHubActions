@@ -1,0 +1,10 @@
+[
+  {
+    "package_type": "docker",
+    "component_name": "my-app:1.0",
+    "path": "docker-local/my-app/1.0/manifest.json",
+    "cyclonedx": true,
+    "cyclonedx_format": "json"
+  },
+  …
+]
